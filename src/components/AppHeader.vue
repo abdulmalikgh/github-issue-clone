@@ -2,18 +2,26 @@
   <div class="mt-5">
     <div class="container">
       <form>
-        <div class="md-form active-pink active-pink-2 mb-3 mt-0">
+        <div class="input-group mb-3">
+          <div class="input-group-prepend">
+            <button
+              class="btn btn-outline-secondary"
+              type="button"
+              id="button-addon1"
+              @click="passSearchText"
+            >Search</button>
+          </div>
           <input
-            class="form-control"
             type="text"
-            placeholder="Search for an issue"
-            aria-label="Search"
+            class="form-control"
+            placeholder="search issue"
+            aria-label="Example text with button addon"
+            aria-describedby="button-addon1"
             v-model="issue"
           />
         </div>
       </form>
     </div>
-    {{ issue }}
   </div>
 </template>
 
@@ -23,6 +31,11 @@ export default {
   data() {
     return {
       issue: ''
+    }
+  },
+  methods: {
+    passSearchText() {
+      this.$emit('issue-data', this.issue)
     }
   }
 }
