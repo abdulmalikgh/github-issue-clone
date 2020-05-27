@@ -1,15 +1,27 @@
 <template>
   <div class="container">
     <AppHeader @issue-data="receiveSearchText" />
-    {{ searchText }}
+    <div class="" v-if="!allIssues">..loading</div>
     <div class="card">
       <div class="card-header">all issues</div>
       <ul class="list-group my-0 py-0">
-        <li class="list-group-item pt-0 pb-1 my-0" v-for="issue in allIssues" :key="issue.id">
-          <router-link class="link" :to="{ name: 'issue-detail', params: { id: issue.number } }">
+        <li
+          class="list-group-item pt-0 pb-1 my-0"
+          v-for="issue in filteredIssues"
+          :key="issue.id"
+        >
+          <router-link
+            class="link"
+            :to="{ name: 'issue-detail', params: { id: issue.number } }"
+          >
             <p class="py-0 my-0">{{ issue.title }}</p>
-            <span>#{{ issue.number }} {{ issue.state }} by {{ issue.user.login }}</span>
-            <span class="comment">{{ issue.comments}}</span>
+            <span
+              >#{{ issue.number }} {{ issue.state }} by
+              {{ issue.user.login }}</span
+            >
+            <span class="comment">{{
+              issue.comments > 0 ? issue.comments : ''
+            }}</span>
           </router-link>
         </li>
       </ul>
@@ -31,27 +43,20 @@ export default {
     return {
       allIssues: [],
       currentPage: 1,
-      searchText: '',
-      created_at: null,
-      searchResult: []
+      searchText: ''
     }
   },
   methods: {
     receiveSearchText(value) {
       this.searchText = value
     },
-    createdAt(value) {
-      this.created_at = value
-    },
-    searcIssue() {},
     getIssues() {
       this.$http
         .get(
           `https://api.github.com/repos/rails/rails/issues?page=${this.currentPage}`
         )
         .then(result => {
-          console.log(result.data)
-          this.allIssues = result.data
+          this.allIssues = result.data.slice(0, 15)
         })
         .catch(err => console.log(err))
     },
@@ -70,6 +75,17 @@ export default {
   },
   created() {
     this.getIssues()
+  },
+  computed: {
+    filteredIssues: function() {
+      if (!this.allIssues) {
+        return
+      } else {
+        return this.allIssues.filter(issue => {
+          return issue.title.match(this.searchText)
+        })
+      }
+    }
   }
 }
 </script>
